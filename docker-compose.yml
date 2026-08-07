@@ -1,0 +1,16 @@
+services:
+  ratagamer:
+    build: .
+    container_name: ratagamer
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - AUTH_SECRET=${AUTH_SECRET}
+      - DATA_DIR=/app/data
+    volumes:
+      - ratagamer-data:/app/data
+
+volumes:
+  ratagamer-data:
