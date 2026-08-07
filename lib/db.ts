@@ -1,8 +1,6 @@
 import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
-import bcrypt from "bcryptjs";
-import { nanoid } from "nanoid";
 
 const dataDir = process.env.DATA_DIR || path.join(process.cwd(), "data");
 if (!fs.existsSync(/*turbopackIgnore: true*/ dataDir)) fs.mkdirSync(/*turbopackIgnore: true*/ dataDir, { recursive: true });
@@ -56,31 +54,6 @@ CREATE TABLE IF NOT EXISTS entries (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `);
-
-const userCount = (
-  db.prepare("SELECT COUNT(*) as c FROM users").get() as { c: number }
-).c;
-
-if (userCount === 0) {
-  const insert = db.prepare(
-    "INSERT INTO users (id, username, name, password_hash) VALUES (?, ?, ?, ?)"
-  );
-  const defaults = [
-    {
-      username: process.env.SEED_USERNAME_1 || "malachi",
-      name: process.env.SEED_NAME_1 || "Malachi",
-      password: process.env.SEED_PASSWORD_1 || "cambiar123",
-    },
-    {
-      username: process.env.SEED_USERNAME_2 || "esposa",
-      name: process.env.SEED_NAME_2 || "Esposa",
-      password: process.env.SEED_PASSWORD_2 || "cambiar123",
-    },
-  ];
-  for (const u of defaults) {
-    insert.run(nanoid(16), u.username, u.name, bcrypt.hashSync(u.password, 10));
-  }
-}
 
 export type User = {
   id: string;

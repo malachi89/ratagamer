@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { getAuthSecret, SESSION_COOKIE } from "@/lib/constants";
 
-const protectedPrefixes = ["/dashboard", "/games", "/api/files"];
+const protectedPrefixes = ["/dashboard", "/games", "/api/files", "/api/steam"];
 const loginPath = "/login";
 
 export async function proxy(request: NextRequest) {
@@ -44,6 +44,7 @@ export const config = {
     "/dashboard/:path*",
     "/games/:path*",
     "/api/files/:path*",
+    "/api/steam/:path*",
     "/login",
   ],
 };

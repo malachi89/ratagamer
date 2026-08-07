@@ -29,6 +29,28 @@ export async function saveUpload(file: File): Promise<UploadResult> {
   return { ok: true, url: `/api/files/${filename}` };
 }
 
+export async function saveSteamCover(appId: string): Promise<UploadResult> {
+  if (!/^\d+$/.test(appId)) {
+    return { ok: false, error: "ID de juego de Steam inválido." };
+  }
+
+  const url = `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/capsule_616x353.jpg`;
+  let res: Response;
+  try {
+    res = await fetch(url);
+  } catch {
+    return { ok: false, error: "No se pudo descargar la portada de Steam." };
+  }
+  if (!res.ok) return { ok: false, error: "No se pudo descargar la portada de Steam." };
+
+  const buf = Buffer.from(await res.arrayBuffer());
+  if (buf.length === 0) return { ok: false, error: "La portada de Steam llegó vacía." };
+
+  const filename = `${Date.now()}-${nanoid(8)}.jpg`;
+  fs.writeFileSync(path.join(uploadsDir, filename), buf);
+  return { ok: true, url: `/api/files/${filename}` };
+}
+
 export function readUpload(filename: string): { data: Buffer; ext: string } | null {
   const safe = path.basename(filename);
   if (safe !== filename || !/^[a-zA-Z0-9._-]+$/.test(safe)) return null;

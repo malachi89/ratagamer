@@ -4,7 +4,7 @@ Diario de gaming privado para una pareja. Registra los juegos que juegan, tus pe
 
 ## Funcionalidades
 
-- **Login privado** para 2 usuarios (sesión JWT segura, cookie httpOnly)
+- **Login privado** con Google OAuth y whitelist de correos (sesión JWT segura, cookie httpOnly)
 - **Juegos**: título, plataforma, estado, calificación, fechas, notas y portada
 - **Personajes**: nombre, nombre de granja, foto y descripción
 - **Diario**: entradas por juego con fecha, horas jugadas, título y notas
@@ -16,24 +16,18 @@ Diario de gaming privado para una pareja. Registra los juegos que juegan, tus pe
 
 - Next.js 16 (App Router, Server Actions)
 - SQLite (`better-sqlite3`)
-- Autenticación con JWT (`jose`) + bcrypt
+- Autenticación con Google OAuth + JWT (`jose`)
 - Sin ORM, SQL directo
 
 ## Desarrollo local
 
 ```bash
 npm install
-cp .env.example .env   # edita AUTH_SECRET y contraseñas
-npm run seed           # crea/actualiza los 2 usuarios (opcional, se auto-crean)
+cp .env.example .env   # edita AUTH_SECRET, GOOGLE_CLIENT_ID/SECRET y GOOGLE_ALLOWED_EMAILS
 npm run dev            # http://localhost:3000
 ```
 
-Los usuarios iniciales (si la base de datos está vacía):
-
-- `malachi` / `cambiar123`
-- `esposa` / `cambiar123`
-
-> **Cambia las contraseñas** definiendo `SEED_PASSWORD_1` y `SEED_PASSWORD_2` en el `.env` antes del primer arranque, o borra la carpeta `data/` para regenerar.
+El acceso es **solo con Google**: al iniciar sesión, si el correo está en `GOOGLE_ALLOWED_EMAILS` se crea el usuario automáticamente (o se reutiliza el existente). La whitelist actual es `saicasvn@gmail.com` y `du.krolita@gmail.com`.
 
 ## Despliegue en VPS (Docker)
 
@@ -48,8 +42,10 @@ openssl rand -base64 32
 # crea el archivo .env
 cat > .env <<EOF
 AUTH_SECRET=TU_SECRETO_GENERADO
-SEED_PASSWORD_1=contraseña_de_malachi
-SEED_PASSWORD_2=contraseña_de_esposa
+GOOGLE_CLIENT_ID=TU_CLIENT_ID
+GOOGLE_CLIENT_SECRET=TU_CLIENT_SECRET
+GOOGLE_ALLOWED_EMAILS=saicasvn@gmail.com,du.krolita@gmail.com
+GOOGLE_REDIRECT_URI=https://TU_DOMINIO/api/auth/google/callback
 EOF
 
 docker compose up -d --build
@@ -82,8 +78,7 @@ proxy.ts          Protección de rutas (autenticación)
 
 ## Seguridad
 
-- Solo los 2 usuarios con sesión válida pueden acceder a las rutas (`proxy.ts`)
-- Contraseñas con bcrypt
+- Solo los correos de la whitelist (`GOOGLE_ALLOWED_EMAILS`) pueden iniciar sesión
 - Sesión JWT firmada, cookie `httpOnly` + `sameSite`
 - Las imágenes se sirven solo tras verificación de sesión y con nombre de archivo saneado (sin path traversal)
 - Validación de tipo y tamaño en subidas
@@ -92,4 +87,3 @@ proxy.ts          Protección de rutas (autenticación)
 
 - `npm run dev` — desarrollo
 - `npm run build` / `npm run start` — producción
-- `npm run seed` — crear/actualizar usuarios

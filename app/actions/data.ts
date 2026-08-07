@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db, type Character, type Entry } from "@/lib/db";
 import { getCurrentUser, newId } from "@/lib/auth";
-import { saveUpload, deleteUpload } from "@/lib/files";
+import { saveUpload, deleteUpload, saveSteamCover } from "@/lib/files";
 
 async function requireAuth() {
   const user = await getCurrentUser();
@@ -18,9 +18,14 @@ export async function createGame(formData: FormData) {
   const user = await requireAuth();
 
   const coverFile = formData.get("cover") as File | null;
+  const steamAppId = String(formData.get("steam_appid") || "").trim();
   let cover = "";
   if (coverFile && coverFile.size > 0) {
     const res = await saveUpload(coverFile);
+    if (!res.ok) return { error: res.error };
+    cover = res.url;
+  } else if (steamAppId) {
+    const res = await saveSteamCover(steamAppId);
     if (!res.ok) return { error: res.error };
     cover = res.url;
   }
@@ -55,9 +60,15 @@ export async function updateGame(id: string, formData: FormData) {
   if (!existing) return { error: "Juego no encontrado" };
 
   const coverFile = formData.get("cover") as File | null;
+  const steamAppId = String(formData.get("steam_appid") || "").trim();
   let cover = existing.cover;
   if (coverFile && coverFile.size > 0) {
     const res = await saveUpload(coverFile);
+    if (!res.ok) return { error: res.error };
+    deleteUpload(cover);
+    cover = res.url;
+  } else if (steamAppId) {
+    const res = await saveSteamCover(steamAppId);
     if (!res.ok) return { error: res.error };
     deleteUpload(cover);
     cover = res.url;

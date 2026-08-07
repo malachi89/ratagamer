@@ -47,14 +47,47 @@ export async function getCurrentUser(): Promise<PublicUser | null> {
   return user ?? null;
 }
 
-export function verifyPassword(password: string, hash: string): boolean {
-  return bcrypt.compareSync(password, hash);
-}
-
 export function hashPassword(password: string): string {
   return bcrypt.hashSync(password, 10);
 }
 
 export function newId(): string {
   return nanoid(16);
+}
+
+export function getGoogleRedirectUri(baseUrl: string): string {
+  return (
+    process.env.GOOGLE_REDIRECT_URI ||
+    `${new URL(baseUrl).origin}/api/auth/google/callback`
+  );
+}
+
+export function getGoogleAllowedEmails(): string[] {
+  return (process.env.GOOGLE_ALLOWED_EMAILS || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isGoogleEmailAllowed(email: string): boolean {
+  const allowed = getGoogleAllowedEmails();
+  if (allowed.length === 0) return false;
+  return allowed.includes(email.toLowerCase());
+}
+
+export function findOrCreateUserByEmail(
+  email: string,
+  name: string
+): PublicUser {
+  const username = email.toLowerCase();
+  const existing = db
+    .prepare("SELECT id, username, name, created_at FROM users WHERE username = ?")
+    .get(username) as PublicUser | undefined;
+  if (existing) return existing;
+
+  const id = newId();
+  db.prepare(
+    "INSERT INTO users (id, username, name, password_hash) VALUES (?, ?, ?, ?)"
+  ).run(id, username, name, hashPassword(newId()));
+  return { id, username, name, created_at: "" };
 }

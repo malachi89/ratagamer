@@ -216,6 +216,89 @@ textarea {
   cursor: pointer;
 }
 
+.autocomplete {
+  position: relative;
+}
+
+.suggest-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+.suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.suggest-item:hover {
+  background: var(--bg-alt);
+}
+
+.suggest-img {
+  width: 46px;
+  height: 21px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--bg-alt);
+  flex-shrink: 0;
+}
+
+.suggest-img.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.suggest-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggest-hint {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+}
+
+.suggest-empty {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  padding: 10px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--ok);
+  font-weight: 600;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -259,6 +342,35 @@ textarea {
 
 .btn-block {
   width: 100%;
+}
+
+.btn-google {
+  background: #fff;
+  color: #1f1f1f;
+  border: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.btn-google:hover {
+  opacity: 1;
+  background: #f6f6f6;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  margin: 18px 0 2px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 .row {
