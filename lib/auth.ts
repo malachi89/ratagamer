@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { nanoid } from "nanoid";
 import bcrypt from "bcryptjs";
 import { db, type PublicUser } from "./db";
-import { getAuthSecret, SESSION_COOKIE } from "./constants";
+import { getAuthSecret, getBaseUrl, SESSION_COOKIE } from "./constants";
 
 export { SESSION_COOKIE };
 
@@ -55,10 +55,10 @@ export function newId(): string {
   return nanoid(16);
 }
 
-export function getGoogleRedirectUri(baseUrl: string): string {
+export function getGoogleRedirectUri(requestUrl: string): string {
   return (
     process.env.GOOGLE_REDIRECT_URI ||
-    `${new URL(baseUrl).origin}/api/auth/google/callback`
+    `${getBaseUrl(requestUrl)}/api/auth/google/callback`
   );
 }
 

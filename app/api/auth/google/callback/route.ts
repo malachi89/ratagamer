@@ -6,6 +6,7 @@ import {
   getGoogleRedirectUri,
   isGoogleEmailAllowed,
 } from "@/lib/auth";
+import { getBaseUrl } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
@@ -14,7 +15,7 @@ const googleKeys = createRemoteJWKSet(
 );
 
 function redirectToLogin(request: NextRequest, message: string) {
-  const url = new URL("/login", request.url);
+  const url = new URL("/login", getBaseUrl(request.url));
   url.searchParams.set("error", message);
   return NextResponse.redirect(url);
 }
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
   const user = findOrCreateUserByEmail(email, name || email.split("@")[0] || "Usuario");
   await createSession(user);
 
-  const response = NextResponse.redirect(new URL("/dashboard", request.url));
+  const response = NextResponse.redirect(new URL("/dashboard", getBaseUrl(request.url)));
   response.cookies.delete("google_oauth_state");
   return response;
 }
