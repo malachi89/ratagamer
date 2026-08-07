@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 
 type GameInput = {
   title?: string;
@@ -9,6 +10,7 @@ type GameInput = {
   rating?: number;
   started_at?: string;
   finished_at?: string;
+  farm_name?: string;
   notes?: string;
   cover?: string;
 };
@@ -92,6 +94,12 @@ export default function GameForm({
     const formData = new FormData(e.currentTarget);
     formData.set("title", title);
     if (steamAppId) formData.set("steam_appid", steamAppId);
+    const coverFile = formData.get("cover") as File | null;
+    if (coverFile && coverFile.size > MAX_UPLOAD_SIZE) {
+      setError("La imagen es demasiado grande. Intenta subir una más pequeña (máx 15 MB).");
+      setPending(false);
+      return;
+    }
     const res = await action(formData);
     if (res && "error" in res && res.error) {
       setError(res.error);
@@ -179,6 +187,10 @@ export default function GameForm({
           <label htmlFor="finished_at">Fecha de fin</label>
           <input id="finished_at" name="finished_at" type="date" defaultValue={game?.finished_at} />
         </div>
+      </div>
+      <div className="field">
+        <label htmlFor="farm_name">Nombre de granja/mundo</label>
+        <input id="farm_name" name="farm_name" defaultValue={game?.farm_name} placeholder="Ej. Granja Rata, Mundo Helado..." />
       </div>
       <div className="field">
         <label htmlFor="cover">Portada (opcional si ya elegiste de Steam)</label>

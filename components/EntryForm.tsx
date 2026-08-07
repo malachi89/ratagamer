@@ -22,9 +22,9 @@ export default function EntryForm({ gameId }: { gameId: string }) {
       setPending(false);
       return;
     }
+    e.currentTarget.reset();
     setOpen(false);
     setPending(false);
-    e.currentTarget.reset();
     router.refresh();
   }
 

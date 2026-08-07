@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { nanoid } from "nanoid";
+import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 
 const dataDir = process.env.DATA_DIR || path.join(process.cwd(), "data");
 export const uploadsDir = path.join(dataDir, "uploads");
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-const MAX_SIZE = 15 * 1024 * 1024;
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
 export type UploadResult = { ok: true; url: string } | { ok: false; error: string };
@@ -15,7 +15,7 @@ export async function saveUpload(file: File): Promise<UploadResult> {
   if (!ALLOWED.has(file.type)) {
     return { ok: false, error: "Formato no permitido. Usa JPG, PNG, WEBP o GIF." };
   }
-  if (file.size > MAX_SIZE) {
+  if (file.size > MAX_UPLOAD_SIZE) {
     return { ok: false, error: "La imagen es muy grande (máx 15 MB)." };
   }
 

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, ensureWhitelistedUsers } from "@/lib/auth";
 import CharacterForm from "@/components/CharacterForm";
 import EntryForm from "@/components/EntryForm";
 import CharacterList from "@/components/CharacterList";
@@ -36,6 +36,7 @@ export default async function GameDetailPage({
         rating: number;
         started_at: string;
         finished_at: string;
+        farm_name: string;
         notes: string;
         created_by: string;
       }
@@ -44,7 +45,11 @@ export default async function GameDetailPage({
   if (!game) notFound();
 
   const characters = db
-    .prepare("SELECT * FROM characters WHERE game_id = ? ORDER BY created_at ASC")
+    .prepare(
+      `SELECT c.*, u.name as author_name FROM characters c
+       LEFT JOIN users u ON u.id = c.created_by
+       WHERE c.game_id = ? ORDER BY c.created_at ASC`
+    )
     .all(id) as {
     id: string;
     game_id: string;
@@ -52,8 +57,12 @@ export default async function GameDetailPage({
     farm_name: string;
     avatar: string;
     description: string;
+    created_by: string;
+    author_name: string;
     created_at: string;
   }[];
+
+  const members = ensureWhitelistedUsers();
 
   const entries = db
     .prepare(
@@ -79,7 +88,7 @@ export default async function GameDetailPage({
         <Link href="/games" className="btn btn-secondary btn-sm">← Volver</Link>
         <div style={{ display: "flex", gap: 10 }}>
           <Link href={`/games/${game.id}/edit`} className="btn btn-secondary btn-sm">Editar</Link>
-          <CharacterForm gameId={game.id} />
+          <CharacterForm gameId={game.id} users={members} currentUserId={user.id} />
         </div>
       </div>
 
@@ -115,6 +124,11 @@ export default async function GameDetailPage({
             {game.finished_at && (
               <span>
                 <b>Terminado:</b> {game.finished_at}
+              </span>
+            )}
+            {game.farm_name && (
+              <span>
+                <b>Granja/Mundo:</b> {game.farm_name}
               </span>
             )}
           </div>

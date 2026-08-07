@@ -31,8 +31,8 @@ export async function createGame(formData: FormData) {
   }
 
   db.prepare(
-    `INSERT INTO games (id, title, platform, status, cover, rating, started_at, finished_at, notes, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO games (id, title, platform, status, cover, rating, started_at, finished_at, farm_name, notes, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     newId(),
     String(formData.get("title") || "").trim(),
@@ -42,6 +42,7 @@ export async function createGame(formData: FormData) {
     Number(formData.get("rating") || 0),
     String(formData.get("started_at") || ""),
     String(formData.get("finished_at") || ""),
+    String(formData.get("farm_name") || "").trim(),
     String(formData.get("notes") || ""),
     user.id
   );
@@ -75,7 +76,7 @@ export async function updateGame(id: string, formData: FormData) {
   }
 
   db.prepare(
-    `UPDATE games SET title=?, platform=?, status=?, cover=?, rating=?, started_at=?, finished_at=?, notes=?
+    `UPDATE games SET title=?, platform=?, status=?, cover=?, rating=?, started_at=?, finished_at=?, farm_name=?, notes=?
      WHERE id = ?`
   ).run(
     String(formData.get("title") || "").trim(),
@@ -85,6 +86,7 @@ export async function updateGame(id: string, formData: FormData) {
     Number(formData.get("rating") || 0),
     String(formData.get("started_at") || ""),
     String(formData.get("finished_at") || ""),
+    String(formData.get("farm_name") || "").trim(),
     String(formData.get("notes") || ""),
     id
   );
@@ -117,7 +119,7 @@ export async function deleteGame(id: string) {
 /* ---------- Personajes ---------- */
 
 export async function createCharacter(formData: FormData) {
-  await requireAuth();
+  const user = await requireAuth();
   const gameId = String(formData.get("game_id") || "");
 
   const avatarFile = formData.get("avatar") as File | null;
@@ -129,15 +131,16 @@ export async function createCharacter(formData: FormData) {
   }
 
   db.prepare(
-    `INSERT INTO characters (id, game_id, name, farm_name, avatar, description)
-     VALUES (?, ?, ?, ?, ?, ?)`
+    `INSERT INTO characters (id, game_id, name, farm_name, avatar, description, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
   ).run(
     newId(),
     gameId,
     String(formData.get("name") || "").trim(),
     String(formData.get("farm_name") || "").trim(),
     avatar,
-    String(formData.get("description") || "")
+    String(formData.get("description") || ""),
+    String(formData.get("created_by") || user.id)
   );
 
   revalidatePath(`/games/${gameId}`);

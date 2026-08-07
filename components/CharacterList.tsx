@@ -13,6 +13,7 @@ export default function CharacterList({
     farm_name: string;
     avatar: string;
     description: string;
+    author_name: string;
   }[];
   gameId: string;
 }) {
@@ -37,6 +38,7 @@ export default function CharacterList({
             <h3>{c.name}</h3>
             {c.farm_name && <div className="farm">🏡 {c.farm_name}</div>}
             {c.description && <p className="desc">{c.description}</p>}
+            {c.author_name && <div className="char-owner">👤 {c.author_name}</div>}
             <div style={{ marginTop: 8 }}>
               <button className="btn btn-danger btn-sm" onClick={() => onDelete(c.id)}>
                 Eliminar

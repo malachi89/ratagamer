@@ -3,8 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createCharacter } from "@/app/actions/data";
+import { MAX_UPLOAD_SIZE } from "@/lib/constants";
 
-export default function CharacterForm({ gameId }: { gameId: string }) {
+export default function CharacterForm({
+  gameId,
+  users,
+  currentUserId,
+}: {
+  gameId: string;
+  users: { id: string; name: string }[];
+  currentUserId: string;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,6 +25,12 @@ export default function CharacterForm({ gameId }: { gameId: string }) {
     setError(null);
     const formData = new FormData(e.currentTarget);
     formData.set("game_id", gameId);
+    const avatarFile = formData.get("avatar") as File | null;
+    if (avatarFile && avatarFile.size > MAX_UPLOAD_SIZE) {
+      setError("La imagen es demasiado grande. Intenta subir una más pequeña (máx 15 MB).");
+      setPending(false);
+      return;
+    }
     const res = await createCharacter(formData);
     if (res && res.error) {
       setError(res.error);
@@ -42,6 +57,16 @@ export default function CharacterForm({ gameId }: { gameId: string }) {
               <div className="field">
                 <label htmlFor="char-name">Nombre del personaje *</label>
                 <input id="char-name" name="name" required autoFocus />
+              </div>
+              <div className="field">
+                <label htmlFor="char-owner">Pertenece a</label>
+                <select id="char-owner" name="created_by" defaultValue={currentUserId}>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="field">
                 <label htmlFor="char-farm">Nombre de granja (si aplica)</label>

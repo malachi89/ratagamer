@@ -8,7 +8,7 @@ export default async function LoginPage({
   return (
     <div className="login-wrap">
       <div className="login-card">
-        <h1>🎮 RataGamer</h1>
+        <h1>🍃 RataGamer</h1>
         <p className="sub">Diario de gaming privado</p>
         {error && <div className="error">{error}</div>}
         <a className="btn btn-google btn-block" href="/api/auth/google">

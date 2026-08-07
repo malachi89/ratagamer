@@ -27,6 +27,7 @@ export default async function EditGamePage({
         rating: number;
         started_at: string;
         finished_at: string;
+        farm_name: string;
         notes: string;
       }
     | undefined;
@@ -43,7 +44,7 @@ export default async function EditGamePage({
         <Link href={`/games/${game.id}`} className="btn btn-secondary btn-sm">← Volver</Link>
       </div>
       <div style={{ maxWidth: 560 }}>
-        <GameForm action={(fd) => updateGame(id, fd)} submitLabel="Guardar cambios" game={game} />
+        <GameForm action={updateGame.bind(null, id)} submitLabel="Guardar cambios" game={game} />
         <div style={{ marginTop: 24 }}>
           <DeleteGameButton gameId={game.id} />
         </div>

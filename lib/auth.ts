@@ -91,3 +91,51 @@ export function findOrCreateUserByEmail(
   ).run(id, username, name, hashPassword(newId()));
   return { id, username, name, created_at: "" };
 }
+
+const WHITELIST_NAMES: Record<string, string> = {
+  "saicasvn@gmail.com": "Emmanuel",
+  "du.krolita@gmail.com": "Carolina",
+};
+
+export function ensureWhitelistedUsers(): PublicUser[] {
+  const allowed = getGoogleAllowedEmails();
+  if (allowed.length === 0) {
+    return db.prepare("SELECT id, username, name, created_at FROM users").all() as PublicUser[];
+  }
+  for (const email of allowed) {
+    const name = WHITELIST_NAMES[email] || email.split("@")[0] || "Usuario";
+    const existing = db
+      .prepare("SELECT id, username, name, created_at FROM users WHERE username = ?")
+      .get(email) as PublicUser | undefined;
+    if (existing) {
+      if (existing.name !== name) {
+        db.prepare("UPDATE users SET name = ? WHERE id = ?").run(name, existing.id);
+        existing.name = name;
+      }
+    } else {
+      findOrCreateUserByEmail(email, name);
+    }
+  }
+
+  const allUsers = db.prepare("SELECT id, username, name, created_at FROM users").all() as PublicUser[];
+  for (const u of allUsers) {
+    if (!allowed.includes(u.username.toLowerCase())) {
+      const entryCount = db
+        .prepare("SELECT COUNT(*) AS n FROM entries WHERE author_id = ?")
+        .get(u.id) as { n: number };
+      const gameCount = db
+        .prepare("SELECT COUNT(*) AS n FROM games WHERE created_by = ?")
+        .get(u.id) as { n: number };
+      if (entryCount.n === 0 && gameCount.n === 0) {
+        db.prepare("DELETE FROM users WHERE id = ?").run(u.id);
+      }
+    }
+  }
+
+  return db
+    .prepare(
+      `SELECT id, username, name, created_at FROM users
+       WHERE username IN (${allowed.map(() => "?").join(",")})`
+    )
+    .all(...allowed) as PublicUser[];
+}

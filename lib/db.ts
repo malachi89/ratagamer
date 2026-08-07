@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS games (
   rating INTEGER DEFAULT 0,
   started_at TEXT DEFAULT '',
   finished_at TEXT DEFAULT '',
+  farm_name TEXT DEFAULT '',
   notes TEXT DEFAULT '',
   created_by TEXT NOT NULL REFERENCES users(id),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -40,6 +41,7 @@ CREATE TABLE IF NOT EXISTS characters (
   farm_name TEXT DEFAULT '',
   avatar TEXT DEFAULT '',
   description TEXT DEFAULT '',
+  created_by TEXT DEFAULT '',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -54,6 +56,16 @@ CREATE TABLE IF NOT EXISTS entries (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 `);
+
+const gameCols = db.prepare("PRAGMA table_info(games)").all() as { name: string }[];
+if (!gameCols.some((c) => c.name === "farm_name")) {
+  db.exec("ALTER TABLE games ADD COLUMN farm_name TEXT DEFAULT ''");
+}
+
+const charCols = db.prepare("PRAGMA table_info(characters)").all() as { name: string }[];
+if (!charCols.some((c) => c.name === "created_by")) {
+  db.exec("ALTER TABLE characters ADD COLUMN created_by TEXT DEFAULT ''");
+}
 
 export type User = {
   id: string;
@@ -74,6 +86,7 @@ export type Game = {
   rating: number;
   started_at: string;
   finished_at: string;
+  farm_name: string;
   notes: string;
   created_by: string;
   created_at: string;
@@ -86,6 +99,7 @@ export type Character = {
   farm_name: string;
   avatar: string;
   description: string;
+  created_by: string;
   created_at: string;
 };
 
