@@ -6,7 +6,7 @@ export const metadata = { title: "Juegos - RataGamer" };
 
 export default function GamesPage() {
   const games = db
-    .prepare("SELECT * FROM games ORDER BY created_at DESC")
+    .prepare("SELECT * FROM games ORDER BY started_at DESC, created_at DESC")
     .all() as {
     id: string;
     title: string;
