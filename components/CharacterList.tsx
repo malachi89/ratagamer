@@ -80,9 +80,6 @@ export default function CharacterList({
                 <button className="btn btn-secondary btn-sm" onClick={() => setEditing(c)}>
                   Editar
                 </button>
-                <button className="btn btn-danger btn-sm" onClick={() => onDelete(c.id)}>
-                  Eliminar
-                </button>
               </div>
             </div>
           </div>
@@ -123,12 +120,17 @@ export default function CharacterList({
                 <textarea id="edit-char-desc" name="description" defaultValue={editing.description} placeholder="Nivel, rol, notas..." />
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setEditing(null)}>
-                  Cancelar
+                <button type="button" className="btn btn-danger" onClick={() => onDelete(editing.id)}>
+                  Eliminar personaje
                 </button>
-                <button type="submit" className="btn" disabled={pending}>
-                  {pending ? "Guardando..." : "Guardar"}
-                </button>
+                <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setEditing(null)}>
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn" disabled={pending}>
+                    {pending ? "Guardando..." : "Guardar"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
