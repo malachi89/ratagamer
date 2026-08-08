@@ -53,6 +53,34 @@ docker compose up -d --build
 
 La app quedará en `http://TU_SERVIDOR:3000`. Los datos (base de datos e imágenes) se guardan en el volumen `ratagamer-data` y sobreviven a los rebuilds.
 
+### Con PM2 / next start
+
+```bash
+# en el servidor (una sola vez)
+git clone https://github.com/malachi89/ratagamer.git
+cd ratagamer
+npm install
+cp .env.example .env   # edita AUTH_SECRET, GOOGLE_CLIENT_ID/SECRET, GOOGLE_ALLOWED_EMAILS y GOOGLE_REDIRECT_URI
+npm run build
+pm2 start npm --name ratagamer -- start
+pm2 save && pm2 startup   # para que sobreviva reinicios del servidor
+```
+
+Para desplegar una actualización:
+
+```bash
+cd ratagamer
+git pull origin dev
+npm install          # por si cambiaron dependencias
+npm run build
+pm2 restart ratagamer
+```
+
+Notas:
+- El directorio `data/` (base de datos e imágenes) está en `.gitignore`, así que el `git pull` no toca tus datos.
+- Ver logs: `pm2 logs ratagamer` · estado: `pm2 list`.
+- Verificar que responda: `curl -I http://localhost:3000` (debe devolver `200`).
+
 ### Con Caddy/nginx como proxy reverso + HTTPS
 
 ```bash
