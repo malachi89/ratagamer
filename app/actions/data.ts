@@ -31,8 +31,8 @@ export async function createGame(formData: FormData) {
   }
 
   db.prepare(
-    `INSERT INTO games (id, title, platform, status, cover, rating, started_at, finished_at, farm_name, notes, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    `INSERT INTO games (id, title, platform, status, cover, rating, started_at, finished_at, notes, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).run(
     newId(),
     String(formData.get("title") || "").trim(),
@@ -42,7 +42,6 @@ export async function createGame(formData: FormData) {
     Number(formData.get("rating") || 0),
     String(formData.get("started_at") || ""),
     String(formData.get("finished_at") || ""),
-    String(formData.get("farm_name") || "").trim(),
     String(formData.get("notes") || ""),
     user.id
   );
@@ -76,7 +75,7 @@ export async function updateGame(id: string, formData: FormData) {
   }
 
   db.prepare(
-    `UPDATE games SET title=?, platform=?, status=?, cover=?, rating=?, started_at=?, finished_at=?, farm_name=?, notes=?
+    `UPDATE games SET title=?, platform=?, status=?, cover=?, rating=?, started_at=?, finished_at=?, notes=?
      WHERE id = ?`
   ).run(
     String(formData.get("title") || "").trim(),
@@ -86,7 +85,6 @@ export async function updateGame(id: string, formData: FormData) {
     Number(formData.get("rating") || 0),
     String(formData.get("started_at") || ""),
     String(formData.get("finished_at") || ""),
-    String(formData.get("farm_name") || "").trim(),
     String(formData.get("notes") || ""),
     id
   );
@@ -141,6 +139,39 @@ export async function createCharacter(formData: FormData) {
     avatar,
     String(formData.get("description") || ""),
     String(formData.get("created_by") || user.id)
+  );
+
+  revalidatePath(`/games/${gameId}`);
+  return { ok: true };
+}
+
+export async function updateCharacter(id: string, formData: FormData) {
+  await requireAuth();
+  const gameId = String(formData.get("game_id") || "");
+  const ch = db
+    .prepare("SELECT avatar FROM characters WHERE id = ?")
+    .get(id) as { avatar: string } | undefined;
+  if (!ch) return { error: "Personaje no encontrado" };
+
+  const avatarFile = formData.get("avatar") as File | null;
+  let avatar = ch.avatar;
+  if (avatarFile && avatarFile.size > 0) {
+    const res = await saveUpload(avatarFile);
+    if (!res.ok) return { error: res.error };
+    deleteUpload(avatar);
+    avatar = res.url;
+  }
+
+  db.prepare(
+    `UPDATE characters SET name=?, farm_name=?, avatar=?, description=?, created_by=?
+     WHERE id = ?`
+  ).run(
+    String(formData.get("name") || "").trim(),
+    String(formData.get("farm_name") || "").trim(),
+    avatar,
+    String(formData.get("description") || ""),
+    String(formData.get("created_by") || ""),
+    id
   );
 
   revalidatePath(`/games/${gameId}`);

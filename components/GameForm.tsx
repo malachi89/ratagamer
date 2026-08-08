@@ -10,7 +10,6 @@ type GameInput = {
   rating?: number;
   started_at?: string;
   finished_at?: string;
-  farm_name?: string;
   notes?: string;
   cover?: string;
 };
@@ -180,17 +179,17 @@ export default function GameForm({
       </div>
       <div className="row">
         <div className="field">
-          <label htmlFor="started_at">Fecha de inicio</label>
-          <input id="started_at" name="started_at" type="date" defaultValue={game?.started_at} />
+          <label htmlFor="started_at">Año de inicio</label>
+          <input
+            id="started_at"
+            name="started_at"
+            type="number"
+            min="1970"
+            max={new Date().getFullYear()}
+            defaultValue={game?.started_at}
+            placeholder="Ej. 2023"
+          />
         </div>
-        <div className="field">
-          <label htmlFor="finished_at">Fecha de fin</label>
-          <input id="finished_at" name="finished_at" type="date" defaultValue={game?.finished_at} />
-        </div>
-      </div>
-      <div className="field">
-        <label htmlFor="farm_name">Nombre de granja/mundo</label>
-        <input id="farm_name" name="farm_name" defaultValue={game?.farm_name} placeholder="Ej. Granja Rata, Mundo Helado..." />
       </div>
       <div className="field">
         <label htmlFor="cover">Portada (opcional si ya elegiste de Steam)</label>

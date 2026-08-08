@@ -36,7 +36,6 @@ export default async function GameDetailPage({
         rating: number;
         started_at: string;
         finished_at: string;
-        farm_name: string;
         notes: string;
         created_by: string;
       }
@@ -126,11 +125,6 @@ export default async function GameDetailPage({
                 <b>Terminado:</b> {game.finished_at}
               </span>
             )}
-            {game.farm_name && (
-              <span>
-                <b>Granja/Mundo:</b> {game.farm_name}
-              </span>
-            )}
           </div>
           {game.notes && <p style={{ color: "var(--text-dim)", whiteSpace: "pre-wrap" }}>{game.notes}</p>}
         </div>
@@ -143,7 +137,12 @@ export default async function GameDetailPage({
         {characters.length === 0 ? (
           <div className="empty">Aún no hay personajes registrados.</div>
         ) : (
-          <CharacterList characters={characters} gameId={game.id} />
+          <CharacterList
+            characters={characters}
+            gameId={game.id}
+            users={members}
+            currentUserId={user.id}
+          />
         )}
       </div>
 
