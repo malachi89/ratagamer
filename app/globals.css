@@ -103,8 +103,15 @@ textarea {
   color: #5c94d6;
 }
 
-.nav-brand .logo {
-  font-size: 1.3rem;
+.logo-img {
+  display: block;
+  width: 90px;
+  height: auto;
+  object-fit: contain;
+}
+
+.nav-brand .logo-img {
+  width: 60px;
 }
 
 .nav-links {

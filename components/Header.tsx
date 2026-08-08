@@ -17,7 +17,7 @@ export default function Header({ user }: { user: PublicUser }) {
     <header className="nav">
       <div className="nav-inner">
         <Link href="/dashboard" className="nav-brand">
-          <span className="logo">🌸</span> RataGamer
+          <img src="/ratagamerlogo.png" alt="RataGamer" className="logo-img" />
         </Link>
         <nav className="nav-links">
           {links.map((l) => (
