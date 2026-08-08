@@ -67,7 +67,10 @@ export default function CharacterList({
         {characters.map((c) => (
           <div className="char-card" key={c.id}>
             {c.avatar ? (
-              <img className="char-avatar" src={c.avatar} alt={c.name} />
+              <div className="char-avatar">
+                <img className="char-avatar-bg" src={c.avatar} alt="" aria-hidden />
+                <img className="char-avatar-main" src={c.avatar} alt={c.name} />
+              </div>
             ) : (
               <div className="char-avatar placeholder">👤</div>
             )}

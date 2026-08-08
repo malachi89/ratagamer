@@ -644,10 +644,28 @@ textarea {
 }
 
 .char-avatar {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
-  object-fit: contain;
+  overflow: hidden;
   background: var(--bg-alt);
+}
+
+.char-avatar-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(24px);
+  transform: scale(1.15);
+}
+
+.char-avatar-main {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   display: block;
 }
 
